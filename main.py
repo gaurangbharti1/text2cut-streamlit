@@ -6,6 +6,8 @@ import ffmpeg
 from difflib import Differ
 import time
 
+API_KEY = str(st.secrets["SIEVE_API_KEY"])
+
 st.title("text2cut")
 st.markdown('Built by [Gaurang Bharti](https://twitter.com/gaurang_bharti) using [Sieve](https://www.sievedata.com)')
 
@@ -65,7 +67,7 @@ def send_data(video_link):
     
     headers = {
         'Content-Type': 'application/json',
-        'X-API-Key': str(st.secrets["SIEVE_API_KEY"])
+        'X-API-Key': API_KEY
     } 
     
     data = {
