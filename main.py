@@ -61,7 +61,7 @@ def get_jobs():
     response = requests.get(url, headers=headers)
     return len(response.json()['data'])+1
 
-@st.cache(suppress_st_warning=True)
+@st.cache(suppress_st_warning=True, hash_funcs={"_thread.RLock": lambda _: None})
 def send_data(video_link):
     url = "https://v1-api.sievedata.com/v1/push"
     
