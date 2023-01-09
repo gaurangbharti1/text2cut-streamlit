@@ -14,7 +14,7 @@ st.markdown('Built by [Gaurang Bharti](https://twitter.com/gaurang_bharti) using
 def check_status(url, interval, job_id):
     finished = False
     headers = {
-        'X-API-Key': str(st.secrets["SIEVE_API_KEY"])
+        'X-API-Key': API_KEY
         }
     while True:
         response = requests.get(url, headers=headers)
@@ -39,7 +39,7 @@ def fetch_transcript(job_id):
     url = 'https://v1-api.sievedata.com/v1/query/metadata'
     headers = {
         'Content-Type': 'application/json',
-        'X-API-Key': str(st.secrets["SIEVE_API_KEY"])
+        'X-API-Key': API_KEY
     }
     data = {
         "job_id": job_id,
@@ -56,12 +56,12 @@ def fetch_transcript(job_id):
 def get_jobs():
     url = "https://v1-api.sievedata.com/v1/projects/text2cut_object/jobs"
     headers = {
-        'X-API-Key': str(st.secrets["SIEVE_API_KEY"])
+        'X-API-Key': API_KEY
         }
     response = requests.get(url, headers=headers)
     return len(response.json()['data'])+1
 
-@st.cache(suppress_st_warning=True, hash_funcs={"_thread.RLock": lambda _: None})
+@st.experimental_memo(suppress_st_warning=True)
 def send_data(video_link):
     url = "https://v1-api.sievedata.com/v1/push"
     
