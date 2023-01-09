@@ -126,7 +126,7 @@ def cut_timestamps_to_video(video_in, transcription, text_in, timestamps):
         audio = video_file.audio.filter(
             "aselect", f'({between_str})').filter("asetpts", "N/SR/TB")
 
-        output_video = f'./videos_out/{video_file_name}.mp4'
+        output_video = video_path
         ffmpeg.concat(video, audio,  v=1, a=1).output(
             output_video).overwrite_output().global_args('-loglevel', 'quiet').run()
 
