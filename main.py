@@ -148,14 +148,13 @@ def cut_timestamps_to_video(video_in, transcription, text_in, timestamps):
         "aselect", f'({between_str})').filter("asetpts", "N/SR/TB")
             ffmpeg.concat(video, audio, v=1, a=1).output(
         video_out.name).overwrite_output().global_args('-loglevel', 'info').run()
-            st.video(video_out.name)
             
     else:
         output_video = video_in
 
     tokens = [(token[2:], token[0] if token[0] != " " else None)
               for token in filtered]
-    return (tokens, output_video)
+    return (tokens, video_out.name)
 
 #Streamlit App
 
@@ -179,5 +178,5 @@ if st.session_state['button'] == True:
     if st.button('Cut Video'):
         tokens, cut_video = cut_timestamps_to_video(video_in, transcription_var, text_in, timestamps_var)
         print("TYPE", type(cut_video))
-        #st.video(cut_video)
+        st.video(cut_video)
         st.session_state['button'] = False
