@@ -5,11 +5,31 @@ from pathlib import Path
 import ffmpeg
 from difflib import Differ
 import time
+import cv2
+import tempfile
 
 API_KEY = str(st.secrets["SIEVE_API_KEY"])
 
 st.title("text2cut")
 st.markdown('Built by [Gaurang Bharti](https://twitter.com/gaurang_bharti) using [Sieve](https://www.sievedata.com)')
+
+def get_video_fps(video_link):
+    # Download the video to a temporary file
+    with tempfile.NamedTemporaryFile() as video_file:
+        video_data = requests.get(video_link).content
+        video_file.write(video_data)
+        video_file.flush()
+
+        # Open the video stream
+        video_stream = cv2.VideoCapture(video_file.name)
+
+        # Get the video properties
+        video_fps = video_stream.get(cv2.CAP_PROP_FPS)
+
+        # Release the video stream
+        video_stream.release()
+
+    return video_fps
 
 def check_status(url, interval, job_id):
     finished = False
@@ -120,17 +140,15 @@ def cut_timestamps_to_video(video_in, transcription, text_in, timestamps):
         map(lambda t: f'between(t,{t[0]},{t[1]})', timestamps_to_cut))
 
     if timestamps_to_cut:
-        video_file = ffmpeg.input(video_in)
-        video = video_file.video.filter(
-            "select", f'({between_str})').filter("setpts", "N/FRAME_RATE/TB")
-        audio = video_file.audio.filter(
-            "aselect", f'({between_str})').filter("asetpts", "N/SR/TB")
-
-        output_video = f'{video_path}/{video_file_name}.mp4'
-        print(output_video)
-        ffmpeg.concat(video, audio,  v=1, a=1).output(
-            output_video).overwrite_output().global_args('-loglevel', 'quiet').run()
-
+        with tempfile.NamedTemporaryFile(prefix='output_video_', suffix='.mp4') as video_out:
+            video_file = ffmpeg.input(video_in)
+            video = video_file.video.filter(
+        "select", f'({between_str})').filter("setpts", "N/FRAME_RATE/TB")
+            audio = video_file.audio.filter(
+        "aselect", f'({between_str})').filter("asetpts", "N/SR/TB")
+            output_video, stderr = ffmpeg.concat(video, audio, v=1, a=1).output(
+        video_out.name).overwrite_output().global_args('-loglevel', 'info').run()
+            
     else:
         output_video = video_in
 
