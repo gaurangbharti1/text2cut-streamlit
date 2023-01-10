@@ -140,7 +140,7 @@ def cut_timestamps_to_video(video_in, transcription, text_in, timestamps):
         map(lambda t: f'between(t,{t[0]},{t[1]})', timestamps_to_cut))
 
     if timestamps_to_cut:
-        with tempfile.NamedTemporaryFile(prefix='output_video_', suffix='.mp4') as video_out:
+        with tempfile.NamedTemporaryFile(prefix='output_video_', suffix='.mp4', delete=False) as video_out:
             video_file = ffmpeg.input(video_in)
             video = video_file.video.filter(
         "select", f'({between_str})').filter("setpts", "N/FRAME_RATE/TB")
@@ -177,5 +177,6 @@ if st.session_state['button'] == True:
     text_in = st.text_area("Drag down from the bottom right corner to make the text box bigger", transcription_var)
     if st.button('Cut Video'):
         tokens, cut_video = cut_timestamps_to_video(video_in, transcription_var, text_in, timestamps_var)
+        print(type(cut_video))
         st.video(cut_video)
         st.session_state['button'] = False
