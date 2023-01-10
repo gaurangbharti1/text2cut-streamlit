@@ -148,7 +148,7 @@ def cut_timestamps_to_video(video_in, transcription, text_in, timestamps):
         "aselect", f'({between_str})').filter("asetpts", "N/SR/TB")
             output_video, stderr = ffmpeg.concat(video, audio, v=1, a=1).output(
         video_out.name).overwrite_output().global_args('-loglevel', 'info').run()
-            st.video(output_video.name)
+            st.video(video_out)
             
     else:
         output_video = video_in
@@ -178,6 +178,6 @@ if st.session_state['button'] == True:
     text_in = st.text_area("Drag down from the bottom right corner to make the text box bigger", transcription_var)
     if st.button('Cut Video'):
         tokens, cut_video = cut_timestamps_to_video(video_in, transcription_var, text_in, timestamps_var)
-        print(type(cut_video))
+        print("TYPE", type(cut_video))
         #st.video(cut_video)
         st.session_state['button'] = False
